@@ -47,16 +47,18 @@ class OverlayService : Service() {
 
     private val jealousApps = mapOf(
         "com.ss.android.ugc.aweme" to "抖音",
+        "com.ss.android.ugc.livelite" to "抖音",
         "com.smile.gifmaker" to "快手",
+        "com.kuaishou.nebula" to "快手",
         "com.xingin.xhs" to "小红书",
         "com.tencent.mm" to "微信",
         "com.tencent.mobileqq" to "QQ",
         "com.sina.weibo" to "微博",
         "tv.danmaku.bili" to "哔哩哔哩",
-        "com.kuaishou.nebula" to "快手极速版",
-        "com.ss.android.ugc.live" to "抖音直播",
-        "com.byted.pangle" to "穿山甲",
-        "com.shuqiyuling" to "书旗小说",
+        "com.taobao.taobao" to "淘宝",
+        "com.taobao.idlefish" to "闲鱼",
+        "com.jingdong.app.mall" to "京东",
+        "com.sankuai.meituan" to "美团",
         "com.ss.android.article.news" to "今日头条"
     )
 
@@ -219,7 +221,7 @@ class OverlayService : Service() {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
             val usm = getSystemService(USAGE_STATS_SERVICE) as UsageStatsManager
             val end = System.currentTimeMillis()
-            val events = usm.queryEvents(end - 3000, end)
+            val events = usm.queryEvents(end - 60000, end)
             val ev = UsageEvents.Event()
             var pkg: String? = null
             while (events.hasNextEvent()) {
