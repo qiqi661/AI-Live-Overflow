@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <style>
   body { margin:0; background:transparent; overflow:hidden; -webkit-user-select:none; user-select:none; }
-  #wrap { position:relative; width:180px; height:230px; }
+  #wrap { position:relative; width:180px; height:240px; }
   #pet { position:absolute; bottom:0; left:0; width:180px; height:180px; transition:transform .18s; }
   #bubble { position:absolute; top:0; left:22px; max-width:150px; background:rgba(255,255,255,.96); color:#333; border-radius:12px; padding:8px 11px; font-size:13px; line-height:1.4; box-shadow:0 2px 10px rgba(0,0,0,.16); opacity:0; transition:opacity .35s; font-family:sans-serif; word-break:break-all; }
   #bubble::after { content:''; position:absolute; bottom:-7px; left:26px; border:7px solid transparent; border-top-color:rgba(255,255,255,.96); border-bottom:none; }
@@ -19,23 +19,15 @@
   #bubble.green { background:#dff5e4; color:#1a6b2a; }
   #bubble.green::after { border-top-color:#dff5e4; }
 
-  .eye, .eyeB, .mouthN, .mouthH, .mouthF, .blush, .zzz, .tear { opacity:0; }
-  body.idle .eye { opacity:1; }
-  body.idle .mouthN { opacity:1; }
-  body.happy .eye { opacity:1; }
-  body.happy .mouthH { opacity:1; }
-  body.happy .blush { opacity:1; }
-  body.sad .eyeB { opacity:1; }
-  body.sad .mouthF { opacity:1; }
-  body.sad .tear { opacity:1; animation:drop 1.2s infinite; }
-  body.angry .eye { opacity:1; }
-  body.angry .mouthF { opacity:1; }
-  body.angry .blush { opacity:.6; }
-  body.sleep .eyeB { opacity:1; }
-  body.sleep .mouthN { opacity:1; }
+  .eye, .eyeB, .brow, .mouthN, .mouthH, .mouthF, .blush, .zzz, .tear, .whisker { opacity:0; }
+  body.idle .eye, body.idle .mouthN, body.idle .whisker { opacity:1; }
+  body.happy .eyeB, body.happy .mouthH, body.happy .blush, body.happy .whisker { opacity:1; }
+  body.sad .eyeB, body.sad .mouthF, body.sad .tear { opacity:1; }
+  body.sad .tear { animation:drop 1.2s infinite; }
+  body.angry .eye, body.angry .brow, body.angry .mouthF, body.angry .whisker { opacity:1; }
+  body.sleep .eyeB, body.sleep .mouthN, body.sleep .whisker { opacity:1; }
   body.sleep .zzz { opacity:1; animation:float 2s infinite; }
-  body.surprised .eye { opacity:1; }
-  body.surprised .mouthN { opacity:1; }
+  body.surprised .eye, body.surprised .mouthN, body.surprised .whisker { opacity:1; }
   body.surprised #pet { animation:bounce .4s; }
 
   @keyframes drop { 0%{transform:translateY(0);opacity:0;} 30%{opacity:1;} 100%{transform:translateY(10px);opacity:0;} }
@@ -43,30 +35,45 @@
   @keyframes bounce { 0%{transform:scale(1);} 40%{transform:scale(1.12);} 100%{transform:scale(1);} }
   @keyframes blink { 0%,94%,100%{transform:scaleY(1);} 97%{transform:scaleY(.08);} }
   body.idle .eyeL, body.idle .eyeR { animation:blink 3.6s infinite; transform-origin:center; }
+  body.happy #pet { animation:wobble 1.6s infinite; }
+  @keyframes wobble { 0%,100%{transform:rotate(0);} 25%{transform:rotate(-4deg);} 75%{transform:rotate(4deg);} }
 </style>
 </head>
 <body class="idle">
 <div id="wrap">
-  <div id="bubble">嗨</div>
+  <div id="bubble">喵</div>
   <svg id="pet" viewBox="0 0 200 200">
-    <ellipse cx="100" cy="118" rx="52" ry="46" fill="#7C9BFF"/>
-    <ellipse cx="60" cy="96" rx="15" ry="20" fill="#7C9BFF"/>
-    <ellipse cx="140" cy="96" rx="15" ry="20" fill="#7C9BFF"/>
-    <path d="M62 78 L55 56 L78 70 Z" fill="#5F7FE0"/>
-    <path d="M138 78 L145 56 L122 70 Z" fill="#5F7FE0"/>
-    <ellipse cx="100" cy="122" rx="34" ry="26" fill="#EAF0FF"/>
-    <circle class="eye eyeL" cx="85" cy="110" r="6" fill="#2B2B3A"/>
-    <circle class="eye eyeR" cx="115" cy="110" r="6" fill="#2B2B3A"/>
-    <path class="eyeB eyeBL" d="M78 110 h14" stroke="#2B2B3A" stroke-width="3" stroke-linecap="round"/>
-    <path class="eyeB eyeBR" d="M108 110 h14" stroke="#2B2B3A" stroke-width="3" stroke-linecap="round"/>
-    <path class="mouthN" d="M92 134 Q100 130 108 134" stroke="#2B2B3A" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path class="mouthH" d="M88 132 Q100 144 112 132" stroke="#2B2B3A" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path class="mouthF" d="M90 136 Q100 128 110 136" stroke="#2B2B3A" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <ellipse class="blush blushL" cx="74" cy="122" rx="9" ry="5" fill="#FFA3B5" opacity="0"/>
-    <ellipse class="blush blushR" cx="126" cy="122" rx="9" ry="5" fill="#FFA3B5" opacity="0"/>
-    <path class="tear" d="M120 116 q4 7 0 11 q-4 -4 0 -11" fill="#8EC5FF"/>
-    <text class="zzz" x="140" y="78" font-size="18" fill="#7C9BFF" font-family="sans-serif">z</text>
-    <text class="zzz" x="152" y="60" font-size="14" fill="#9DB4FF" font-family="sans-serif">z</text>
+    <path d="M146 148 q34 -26 28 -62 q-2 -14 -14 -18" stroke="#F5A623" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <ellipse cx="100" cy="152" rx="40" ry="36" fill="#F5A623"/>
+    <ellipse cx="100" cy="161" rx="25" ry="23" fill="#FFF3E0"/>
+    <ellipse cx="79" cy="174" rx="12" ry="7" fill="#FFD54F"/>
+    <ellipse cx="121" cy="174" rx="12" ry="7" fill="#FFD54F"/>
+    <circle cx="100" cy="90" r="48" fill="#F5A623"/>
+    <path d="M58 62 L46 24 L84 48 Z" fill="#F5A623"/>
+    <path d="M142 62 L154 24 L116 48 Z" fill="#F5A623"/>
+    <path d="M60 57 L52 32 L78 49 Z" fill="#FF8A80"/>
+    <path d="M140 57 L148 32 L122 49 Z" fill="#FF8A80"/>
+    <ellipse class="eye eyeL" cx="80" cy="86" rx="9" ry="11" fill="#3E2723"/>
+    <ellipse class="eye eyeR" cx="120" cy="86" rx="9" ry="11" fill="#3E2723"/>
+    <circle cx="83" cy="82" r="3" fill="#ffffff"/>
+    <circle cx="123" cy="82" r="3" fill="#ffffff"/>
+    <path class="eyeB eyeBL" d="M70 86 q10 -9 20 0" stroke="#3E2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path class="eyeB eyeBR" d="M110 86 q10 -9 20 0" stroke="#3E2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path class="brow browL" d="M70 70 q10 -8 22 -3" stroke="#3E2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path class="brow browR" d="M108 67 q12 -5 22 3" stroke="#3E2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M95 101 L105 101 L100 107 Z" fill="#F48FB1"/>
+    <path class="mouthN" d="M100 107 q-5 -6 -11 -4 q-7 2 -5 8 q3 6 16 5 q13 1 16 -5 q2 -6 -5 -8 q-6 -2 -11 4" stroke="#3E2723" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path class="mouthH" d="M88 105 Q100 122 112 105" stroke="#3E2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path class="mouthF" d="M90 112 Q100 103 110 112" stroke="#3E2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse class="blush blushL" cx="70" cy="102" rx="8" ry="5" fill="#FFB6C1"/>
+    <ellipse class="blush blushR" cx="130" cy="102" rx="8" ry="5" fill="#FFB6C1"/>
+    <path class="tear" d="M128 92 q5 8 0 13 q-5 -5 0 -13" fill="#8EC5FF"/>
+    <text class="zzz" x="140" y="66" font-size="18" fill="#F5A623" font-family="sans-serif" font-weight="bold">z</text>
+    <text class="zzz" x="154" y="46" font-size="13" fill="#FFC46B" font-family="sans-serif" font-weight="bold">z</text>
+    <path class="whisker" d="M52 96 q-14 -2 -22 2" stroke="#D98E1F" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path class="whisker" d="M50 104 q-14 2 -20 8" stroke="#D98E1F" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path class="whisker" d="M148 96 q14 -2 22 2" stroke="#D98E1F" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path class="whisker" d="M150 104 q14 2 20 8" stroke="#D98E1F" stroke-width="2" fill="none" stroke-linecap="round"/>
   </svg>
 </div>
 <script>
@@ -100,10 +107,10 @@
   function petTap() {
     var r = Math.floor(Math.random() * 4);
     var reacts = [
-      function(){ setExpression('happy'); setBubble('别戳啦'); },
-      function(){ setExpression('surprised'); setBubble('干嘛'); },
+      function(){ setExpression('happy'); setBubble('喵~别戳啦'); },
+      function(){ setExpression('surprised'); setBubble('喵？！'); },
       function(){ setExpression('happy'); setBubble('嘿嘿'); },
-      function(){ setExpression('angry'); setBubble('再戳我生气了'); }
+      function(){ setExpression('angry'); setBubble('再戳我挠你了喵'); }
     ];
     reacts[r]();
     setTimeout(function(){ setExpression('idle'); }, 2500);

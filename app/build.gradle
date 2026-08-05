@@ -7,17 +7,31 @@ android {
     namespace 'com.qiqi.pet'
     compileSdk 34
 
+    signingConfigs {
+        pet {
+            storeFile file('../keystore/pet.p12')
+            storePassword 'qiqi2026'
+            keyAlias 'pet'
+            keyPassword 'qiqi2026'
+            storeType 'PKCS12'
+        }
+    }
+
     defaultConfig {
         applicationId "com.qiqi.pet"
         minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
 
     buildTypes {
         release {
+            signingConfig signingConfigs.pet
             minifyEnabled false
+        }
+        debug {
+            signingConfig signingConfigs.pet
         }
     }
 
