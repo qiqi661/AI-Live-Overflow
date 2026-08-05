@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<style>
+  body { margin:0; background:transparent; overflow:hidden; -webkit-user-select:none; user-select:none; }
+  #wrap { position:relative; width:180px; height:230px; }
+  #pet { position:absolute; bottom:0; left:0; width:180px; height:180px; transition:transform .18s; }
+  #bubble { position:absolute; top:0; left:22px; max-width:150px; background:rgba(255,255,255,.96); color:#333; border-radius:12px; padding:8px 11px; font-size:13px; line-height:1.4; box-shadow:0 2px 10px rgba(0,0,0,.16); opacity:0; transition:opacity .35s; font-family:sans-serif; word-break:break-all; }
+  #bubble::after { content:''; position:absolute; bottom:-7px; left:26px; border:7px solid transparent; border-top-color:rgba(255,255,255,.96); border-bottom:none; }
+  #bubble.show { opacity:1; }
+  #bubble.pink { background:#ffe3ef; color:#b23a6b; }
+  #bubble.pink::after { border-top-color:#ffe3ef; }
+  #bubble.grey { background:#eceff1; color:#555; }
+  #bubble.grey::after { border-top-color:#eceff1; }
+  #bubble.red { background:#ffd9d9; color:#a11; }
+  #bubble.red::after { border-top-color:#ffd9d9; }
+  #bubble.green { background:#dff5e4; color:#1a6b2a; }
+  #bubble.green::after { border-top-color:#dff5e4; }
+
+  .eye, .eyeB, .mouthN, .mouthH, .mouthF, .blush, .zzz, .tear { opacity:0; }
+  body.idle .eye { opacity:1; }
+  body.idle .mouthN { opacity:1; }
+  body.happy .eye { opacity:1; }
+  body.happy .mouthH { opacity:1; }
+  body.happy .blush { opacity:1; }
+  body.sad .eyeB { opacity:1; }
+  body.sad .mouthF { opacity:1; }
+  body.sad .tear { opacity:1; animation:drop 1.2s infinite; }
+  body.angry .eye { opacity:1; }
+  body.angry .mouthF { opacity:1; }
+  body.angry .blush { opacity:.6; }
+  body.sleep .eyeB { opacity:1; }
+  body.sleep .mouthN { opacity:1; }
+  body.sleep .zzz { opacity:1; animation:float 2s infinite; }
+  body.surprised .eye { opacity:1; }
+  body.surprised .mouthN { opacity:1; }
+  body.surprised #pet { animation:bounce .4s; }
+
+  @keyframes drop { 0%{transform:translateY(0);opacity:0;} 30%{opacity:1;} 100%{transform:translateY(10px);opacity:0;} }
+  @keyframes float { 0%{transform:translateY(0);opacity:0;} 30%{opacity:1;} 100%{transform:translateY(-14px);opacity:0;} }
+  @keyframes bounce { 0%{transform:scale(1);} 40%{transform:scale(1.12);} 100%{transform:scale(1);} }
+  @keyframes blink { 0%,94%,100%{transform:scaleY(1);} 97%{transform:scaleY(.08);} }
+  body.idle .eyeL, body.idle .eyeR { animation:blink 3.6s infinite; transform-origin:center; }
+</style>
+</head>
+<body class="idle">
+<div id="wrap">
+  <div id="bubble">嗨</div>
+  <svg id="pet" viewBox="0 0 200 200">
+    <ellipse cx="100" cy="118" rx="52" ry="46" fill="#7C9BFF"/>
+    <ellipse cx="60" cy="96" rx="15" ry="20" fill="#7C9BFF"/>
+    <ellipse cx="140" cy="96" rx="15" ry="20" fill="#7C9BFF"/>
+    <path d="M62 78 L55 56 L78 70 Z" fill="#5F7FE0"/>
+    <path d="M138 78 L145 56 L122 70 Z" fill="#5F7FE0"/>
+    <ellipse cx="100" cy="122" rx="34" ry="26" fill="#EAF0FF"/>
+    <circle class="eye eyeL" cx="85" cy="110" r="6" fill="#2B2B3A"/>
+    <circle class="eye eyeR" cx="115" cy="110" r="6" fill="#2B2B3A"/>
+    <path class="eyeB eyeBL" d="M78 110 h14" stroke="#2B2B3A" stroke-width="3" stroke-linecap="round"/>
+    <path class="eyeB eyeBR" d="M108 110 h14" stroke="#2B2B3A" stroke-width="3" stroke-linecap="round"/>
+    <path class="mouthN" d="M92 134 Q100 130 108 134" stroke="#2B2B3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path class="mouthH" d="M88 132 Q100 144 112 132" stroke="#2B2B3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path class="mouthF" d="M90 136 Q100 128 110 136" stroke="#2B2B3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse class="blush blushL" cx="74" cy="122" rx="9" ry="5" fill="#FFA3B5" opacity="0"/>
+    <ellipse class="blush blushR" cx="126" cy="122" rx="9" ry="5" fill="#FFA3B5" opacity="0"/>
+    <path class="tear" d="M120 116 q4 7 0 11 q-4 -4 0 -11" fill="#8EC5FF"/>
+    <text class="zzz" x="140" y="78" font-size="18" fill="#7C9BFF" font-family="sans-serif">z</text>
+    <text class="zzz" x="152" y="60" font-size="14" fill="#9DB4FF" font-family="sans-serif">z</text>
+  </svg>
+</div>
+<script>
+  var bubble = document.getElementById('bubble');
+  var bubbleTimer = null;
+
+  function setExpression(expr) {
+    var cls = 'idle';
+    if (expr === 'happy' || expr === 'love' || expr === 'excited') cls = 'happy';
+    else if (expr === 'sad') cls = 'sad';
+    else if (expr === 'angry' || expr === 'jealous' || expr === 'jealousy') cls = 'angry';
+    else if (expr === 'sleep' || expr === 'sleeping') cls = 'sleep';
+    else if (expr === 'surprised' || expr === 'shock') cls = 'surprised';
+    document.body.className = cls;
+  }
+
+  function setBubble(text, style) {
+    if (!text) { bubble.classList.remove('show'); return; }
+    bubble.textContent = text;
+    bubble.className = style ? style : 'normal';
+    requestAnimationFrame(function(){ bubble.classList.add('show'); });
+    if (bubbleTimer) clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(function(){ bubble.classList.remove('show'); }, 6000);
+  }
+
+  function setPetState(s) {
+    if (s && s.expression) setExpression(s.expression);
+    if (s && s.bubble) setBubble(s.bubble, s.style);
+  }
+
+  function petTap() {
+    var r = Math.floor(Math.random() * 4);
+    var reacts = [
+      function(){ setExpression('happy'); setBubble('别戳啦'); },
+      function(){ setExpression('surprised'); setBubble('干嘛'); },
+      function(){ setExpression('happy'); setBubble('嘿嘿'); },
+      function(){ setExpression('angry'); setBubble('再戳我生气了'); }
+    ];
+    reacts[r]();
+    setTimeout(function(){ setExpression('idle'); }, 2500);
+  }
+
+  window.setPetState = setPetState;
+  window.petTap = petTap;
+</script>
+</body>
+</html>
