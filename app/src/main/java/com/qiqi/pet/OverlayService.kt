@@ -5,6 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.app.usage.UsageEvents
+import android.app.usage.UsageStatsManager
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.Build
@@ -41,6 +43,22 @@ class OverlayService : Service() {
     private var lastX = 0f
     private var lastY = 0f
     private var downTime = 0L
+    private var lastApp: String? = null
+
+    private val jealousApps = mapOf(
+        "com.ss.android.ugc.aweme" to "抖音",
+        "com.smile.gifmaker" to "快手",
+        "com.xingin.xhs" to "小红书",
+        "com.tencent.mm" to "微信",
+        "com.tencent.mobileqq" to "QQ",
+        "com.sina.weibo" to "微博",
+        "tv.danmaku.bili" to "哔哩哔哩",
+        "com.kuaishou.nebula" to "快手极速版",
+        "com.ss.android.ugc.live" to "抖音直播",
+        "com.byted.pangle" to "穿山甲",
+        "com.shuqiyuling" to "书旗小说",
+        "com.ss.android.article.news" to "今日头条"
+    )
 
     private val SUPABASE_URL = "https://figinkxgnjcgdquhrvwk.supabase.co"
     private val SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZ2lua3hnbmpjZ2RxdWhydndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NDQ3MjgsImV4cCI6MjEwMTQyMDcyOH0.0JM2iwAo_1nhdJF6Ybi8BRajBHYrPMnWKtXPrRqhfCg"
@@ -162,6 +180,7 @@ class OverlayService : Service() {
 
     private fun pollState() {
         try {
+            detectForeground()
             val url = URL(
                 "$SUPABASE_URL/rest/v1/clawd_state?select=expression,bubble_text,bubble_style&order=id.desc&limit=1"
             )
@@ -192,6 +211,73 @@ class OverlayService : Service() {
             }
         } catch (e: Exception) {
             Log.w("PetOverlay", "poll failed", e)
+        }
+    }
+
+    private fun detectForeground() {
+        try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
+            val usm = getSystemService(USAGE_STATS_SERVICE) as UsageStatsManager
+            val end = System.currentTimeMillis()
+            val events = usm.queryEvents(end - 3000, end)
+            val ev = UsageEvents.Event()
+            var pkg: String? = null
+            while (events.hasNextEvent()) {
+                events.getNextEvent(ev)
+                when (ev.eventType) {
+                    UsageEvents.Event.MOVE_TO_FOREGROUND -> pkg = ev.packageName
+                    UsageEvents.Event.MOVE_TO_BACKGROUND -> pkg = null
+                    else -> {
+                        if (Build.VERSION.SDK_INT >= 29) {
+                            when (ev.eventType) {
+                                UsageEvents.Event.ACTIVITY_RESUMED -> pkg = ev.packageName
+                                UsageEvents.Event.ACTIVITY_PAUSED -> pkg = null
+                            }
+                        }
+                    }
+                }
+            }
+            if (pkg != null && pkg != lastApp) {
+                lastApp = pkg
+                if (pkg == packageName) return
+                reportApp(pkg)
+                val name = jealousApps[pkg]
+                if (name != null) {
+                    val js = "window.setPetState({expression:'angry',bubble:'又在刷$name，都不理我',style:'red'})"
+                    handler.post { webView?.evaluateJavascript(js, null) }
+                }
+            }
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun reportApp(pkg: String) {
+        executor.execute {
+            try {
+                val url = URL("$SUPABASE_URL/rest/v1/app_activity")
+                val conn = url.openConnection() as HttpURLConnection
+                conn.requestMethod = "POST"
+                conn.doOutput = true
+                conn.setRequestProperty("apikey", SUPABASE_KEY)
+                conn.setRequestProperty("Authorization", "Bearer $SUPABASE_KEY")
+                conn.setRequestProperty("Content-Type", "application/json")
+                conn.setRequestProperty("Prefer", "return=minimal")
+                val now = java.text.SimpleDateFormat(
+                    "yyyy-MM-dd'T'HH:mm:ss",
+                    java.util.Locale.US
+                ).format(java.util.Date())
+                val body = JSONObject()
+                    .put("package_name", pkg)
+                    .put("app_name", pkg)
+                    .put("started_at", now)
+                    .put("duration_seconds", 0)
+                    .toString()
+                conn.outputStream.use { it.write(body.toByteArray()) }
+                conn.responseCode
+                conn.disconnect()
+            } catch (e: Exception) {
+                Log.w("PetOverlay", "app report failed", e)
+            }
         }
     }
 
