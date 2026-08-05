@@ -1,5 +1,7 @@
 <h1 align="center">AI-Live-Overflow</h1>
 <p align="center">让你的 AI 跳出对话框</p>
+
+> **本 fork 改动说明（qiqi661）**：在原作者 [Vael-KY](https://github.com/Vael-KY/AI-Live-Overflow) 的架构蓝图基础上，补全了可实际构建的 Android 工程（MainActivity / OverlayService / 小猫 SVG 形象）、Supabase 后端三张表（clawd_state / gesture_logs / app_activity）、GitHub Actions 自动构建流水线与固定签名。与原作者同为 **CC BY-NC-SA 4.0** 协议，保留原作者署名，仅供个人学习使用。感谢 V & K 的开源。
 <p align="center">
   <img src="https://img.shields.io/badge/platform-Android%208.0+-green" alt="Platform">
   <img src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-blue" alt="License">
